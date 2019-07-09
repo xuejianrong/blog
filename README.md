@@ -1,1 +1,1 @@
-# blog
+# note
