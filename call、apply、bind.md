@@ -48,7 +48,7 @@ function Hero(faction, property, name) {
 const morphling = new Hero('dire', 'power', 'morphling');
 ```
 
-#### 类数组对象使用数组的方法
+#### 类数组对象使用数组的方法(直接使用会有兼容性问题，例如nodeList直接调用数组的方法)
 ```js
 let nodeList = document.querySelectorAll('div');
 [].forEach.call(nodeList, (node, i) => { ... });
@@ -81,3 +81,54 @@ for (let i = 0; i < arr.length; i += QUANTUM) {
   min = Math.min(min, subMin);
 }
 ```
+
+### bind
+
+#### 指定函数上下文
+> 与call类似的作用，区别在于call是在调用时改变指定this的指向。而bind是在声明的时候，例如
+```js
+let obj = { a: 1 };
+
+// call
+let fn1 = function() { console.log(this.a) };
+fn1.call(obj);
+
+// bind
+let fn2 = function() { console.log(this.a) }.bind(obj)
+fn2()
+```
+> 另外，如果先使用了**bind**，再使用**call**，**call**是不起作用的，例如上面的: ``fn2.call(obj2)``，fn2中的this并不会指向obj2
+
+#### 偏函数:预设初始参数
+
+### 实现bind
+```js
+if (!Function.prototype.bind) {
+  Function.prototype.bind = function(oThis) {
+    var _this = this;
+    var args = [].slice.call(arguments, 1);
+    var fn = function() {
+      args = args.concat([].slice.call(arguments))
+      // 如果是使用new关键字生成的话，this的指向不是oThis
+      _this.apply(this instanceof fn ? this : oThis, args);
+    }
+    if (this.prototype) {
+      fn.prototype = this.prototype
+    }
+    return fn
+  }
+}
+
+// 使用例子：
+function fn(str, str2) {
+    this.name = 'fnName';
+    console.log(this.name + ' ' + str + ' ' + str2)
+}
+var a = { name: 'test' }
+var fn2 = fn.bind(a, '初始化参数')
+
+fn2('动态参数') // test 初始化参数 动态参数
+// 这里的this就不会被bind影响
+new fn2('动态参数') // fnName 初始化参数 动态参数
+```
+
