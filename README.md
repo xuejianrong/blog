@@ -1,3 +1,3 @@
 # note
 
-![call、apply、bind](https://github.com/xuejianrong/note/issues/2)
+[call、apply、bind](https://github.com/xuejianrong/note/issues/2)
